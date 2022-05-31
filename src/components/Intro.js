@@ -9,7 +9,7 @@ class Intro extends React.Component {
           <img
             width="1170"
             height="650"
-            src="./assets/pexels-alexandr-podvalny-1227513.jpeg"
+            src="./assets/pexels-alexandr-podvalny-1227513.jpg"
             alt="Wheat"
           />
         </div>

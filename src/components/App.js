@@ -5,10 +5,10 @@ import Users from './Users';
 import Form from './Form';
 
 class App extends React.Component {
-  state = { shouldRerender: false };
+  state = { isDefaultFetch: false };
 
   onSubmitSuccess = () => {
-    this.setState({ shouldRerender: !this.state.shouldRerender });
+    this.setState({ isDefaultFetch: !this.state.isDefaultFetch });
   };
 
   render() {
@@ -16,7 +16,7 @@ class App extends React.Component {
       <div>
         <Header />
         <Intro />
-        <Users shouldRerender={this.state.shouldRerender} />
+        <Users isDefaultFetch={this.state.isDefaultFetch} />
         <Form onSubmitSuccess={this.onSubmitSuccess} />
       </div>
     );

@@ -13,6 +13,7 @@ class Form extends React.Component {
     super(props);
 
     this.state = {
+      isSubmitSuccess: false,
       positions: [],
       positionsError: '',
       name: '',
@@ -90,13 +91,16 @@ class Form extends React.Component {
       .then((data) => {
         if (data.success) {
           // process success response
+          this.setState({ isSubmitSuccess: true });
           this.props.onSubmitSuccess();
         } else {
           // proccess server errors
+          console.log(data);
         }
       })
       .catch((error) => {
         // proccess network errors
+        console.log(error);
       });
   };
 
@@ -186,6 +190,66 @@ class Form extends React.Component {
     });
   }
 
+  renderInputs() {
+    return (
+      <>
+        <Input
+          name="name"
+          type="text"
+          label="Your name"
+          error={this.state.errors.name}
+          value={this.state.name}
+          onChange={this.onInputChange}
+        />
+        <Input
+          name="email"
+          type="email"
+          label="Email"
+          error={this.state.errors.email}
+          value={this.state.email}
+          onChange={this.onInputChange}
+        />
+        <Input
+          name="tel"
+          type="tel"
+          label="Phone"
+          error={this.state.errors.tel}
+          value={this.state.tel}
+          onChange={this.onInputChange}
+          helperText="+38 (XXX) XXX - XX - XX"
+        />
+        <div>
+          <p>{this.state.positionsError || 'Select your position'}</p>
+          <div className="form-radio">{this.renderPositions()}</div>
+        </div>
+        <div>
+          <div className="input-file">
+            <input
+              type="file"
+              onChange={this.onFileChange}
+              ref={this.fileInput}
+              id="input-file"
+            />
+            <label htmlFor="input-file">Upload</label>
+            <div className="input-file-text">
+              {this.state.imageName || 'Upload your photo'}
+            </div>
+            <div className="input-helper">{this.state.errors.img}</div>
+          </div>
+        </div>
+        <Button buttonText="Sign up" disabled={this.isSubmitDisabled()} />
+      </>
+    );
+  }
+
+  renderSuccessImage() {
+    return (
+      <div className="form-success">
+        <img src="./assets/success-image.svg" alt="Success" />
+      </div>
+    );
+  }
+
   render() {
     return (
       <form
@@ -194,53 +258,15 @@ class Form extends React.Component {
         autoComplete="off"
         className="form"
       >
-        <h2>Working with POST request</h2>
+        <h2>
+          {this.state.isSubmitSuccess
+            ? 'User successfully registered'
+            : 'Working with POST request'}
+        </h2>
         <div className="form-wrapper">
-          <Input
-            name="name"
-            type="text"
-            label="Your name"
-            error={this.state.errors.name}
-            value={this.state.name}
-            onChange={this.onInputChange}
-          />
-          <Input
-            name="email"
-            type="email"
-            label="Email"
-            error={this.state.errors.email}
-            value={this.state.email}
-            onChange={this.onInputChange}
-          />
-          <Input
-            name="tel"
-            type="tel"
-            label="Phone"
-            error={this.state.errors.tel}
-            value={this.state.tel}
-            onChange={this.onInputChange}
-            helperText="+38 (XXX) XXX - XX - XX"
-          />
-          <div>
-            <p>{this.state.positionsError || 'Select your position'}</p>
-            <div className="form-radio">{this.renderPositions()}</div>
-          </div>
-          <div>
-            <div className="input-file">
-              <input
-                type="file"
-                onChange={this.onFileChange}
-                ref={this.fileInput}
-                id="input-file"
-              />
-              <label htmlFor="input-file">Upload</label>
-              <div className="input-file-text">
-                {this.state.imageName || 'Upload your photo'}
-              </div>
-              <div className="input-helper">{this.state.errors.img}</div>
-            </div>
-          </div>
-          <Button buttonText="Sign up" disabled={this.isSubmitDisabled()} />
+          {this.state.isSubmitSuccess
+            ? this.renderSuccessImage()
+            : this.renderInputs()}
         </div>
       </form>
     );
