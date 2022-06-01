@@ -1,0 +1,28 @@
+.tooltip {
+  position: relative;
+
+  &:hover > .tooltip-message {
+    display: block;
+  }
+}
+
+.tooltip-message {
+  display: none;
+
+  position: absolute;
+  top: 100%;
+  left: 50%;
+
+  width: fit-content;
+
+  word-break: break-word;
+
+  transform: translateX(-50%);
+
+  padding: 3px 16px;
+
+  background: rgba(0, 0, 0, 0.87);
+  border-radius: 4px;
+
+  color: white;
+}

@@ -7,6 +7,7 @@ class Users extends React.Component {
     super(props);
 
     this.state = {
+      loading: true,
       errorMessage: '',
       users: [],
       nextUrl: '',
@@ -19,18 +20,28 @@ class Users extends React.Component {
     this.fetchUsers(
       this.state.defaultUrl,
       (data) =>
-        this.setState({ users: data.users, nextUrl: data.links.next_url }),
-      (data) => this.setState({ errorMessage: data.message })
+        this.setState({
+          users: data.users,
+          nextUrl: data.links.next_url,
+          loading: false,
+        }),
+      (data) => this.setState({ errorMessage: data.message, loading: false })
     );
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.isDefaultFetch !== prevProps.isDefaultFetch) {
+      this.setState({ loading: true });
+
       this.fetchUsers(
         this.state.defaultUrl,
         (data) =>
-          this.setState({ users: data.users, nextUrl: data.links.next_url }),
-        () => this.setState({ errorMessage: 'Error' })
+          this.setState({
+            users: data.users,
+            nextUrl: data.links.next_url,
+            loading: false,
+          }),
+        () => this.setState({ errorMessage: 'Error', loading: false })
       );
     }
   }
@@ -72,6 +83,14 @@ class Users extends React.Component {
     });
   }
 
+  renderLoader() {
+    return (
+      <div className="loader">
+        <img src="./assets/preloader.svg" alt="Loader" />
+      </div>
+    );
+  }
+
   render() {
     return (
       <div className="users">
@@ -79,6 +98,7 @@ class Users extends React.Component {
         <div className={`users-list ${this.state.errorMessage ? 'error' : ''}`}>
           {this.state.errorMessage ? this.renderError() : this.renderList()}
         </div>
+        {this.state.loading ? this.renderLoader() : null}
         {this.state.nextUrl && !this.state.errorMessage ? (
           <Button buttonText="Show more" onClick={this.onBtnClick} />
         ) : null}

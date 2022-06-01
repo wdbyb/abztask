@@ -1,11 +1,12 @@
 @import './variables.scss';
+@import './Button.scss';
 @import './Header.scss';
 @import './Intro.scss';
 @import './Users.scss';
 @import './Card.scss';
 @import './Form.scss';
-
-// need some wrapper for blocks
+@import './Tooltip.scss';
+@import './Loader.scss';
 
 body {
   margin: 0;
@@ -31,33 +32,4 @@ h6 {
   font-weight: 400;
 
   text-align: center;
-}
-
-.button {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  min-width: 100px;
-  min-height: 34px;
-
-  padding: 4px;
-  margin: 0;
-
-  background-color: $primary-color;
-  border: 0;
-  border-radius: 80px;
-
-  box-sizing: border-box;
-
-  cursor: pointer;
-
-  &:hover {
-    background-color: #ffe302;
-  }
-
-  &:disabled {
-    color: white;
-    background-color: #b4b4b4;
-  }
 }

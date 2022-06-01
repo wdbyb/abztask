@@ -1,12 +1,14 @@
 .header {
+  padding: 13px 16px;
+
+  background-color: white;
+}
+
+.header-wrapper {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-
-  padding: 13px 16px;
-
-  background-color: white;
 }
 
 .header-logo {
@@ -29,7 +31,6 @@
 .header-list {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  // flex-wrap: wrap;
   column-gap: 10px;
 
   width: 210px;
@@ -48,9 +49,11 @@
 
 @media (min-width: 1024px) {
   .header {
-    max-width: 1170px;
-
     padding: 13px 60px;
+  }
+
+  .header-wrapper {
+    max-width: 1170px;
     margin: auto;
   }
 }

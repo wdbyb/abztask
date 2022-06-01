@@ -15,7 +15,6 @@ class Form extends React.Component {
     this.state = {
       isSubmitSuccess: false,
       positions: [],
-      positionsError: '',
       name: '',
       email: '',
       tel: '',
@@ -26,6 +25,7 @@ class Form extends React.Component {
         email: '',
         tel: '',
         img: '',
+        positions: '',
       },
     };
     this.fileInput = React.createRef();
@@ -39,9 +39,20 @@ class Form extends React.Component {
       .then((data) => {
         if (data.success) {
           // process success response
-          this.setState({ positions: data.positions, positionsError: '' });
+          this.setState({
+            positions: data.positions,
+            errors: {
+              ...this.state.errors,
+              positions: '',
+            },
+          });
         } else {
-          this.setState({ positionsError: 'Positions not found' });
+          this.setState({
+            errors: {
+              ...this.state.errors,
+              positions: 'Positions not found',
+            },
+          });
         }
       });
   }
@@ -54,7 +65,13 @@ class Form extends React.Component {
     const { name, email, tel, imageName, errors } = this.state;
 
     if (name && email && tel && imageName) {
-      if (!errors.email && !errors.name && !errors.img && !errors.tel) {
+      if (
+        !errors.email &&
+        !errors.name &&
+        !errors.img &&
+        !errors.tel &&
+        !errors.positions
+      ) {
         return false;
       }
     }
@@ -64,6 +81,10 @@ class Form extends React.Component {
 
   onSubmit = async (event) => {
     event.preventDefault();
+
+    if (this.isSubmitDisabled()) {
+      return;
+    }
 
     const response = await fetch(
       'https://frontend-test-assignment-api.abz.agency/api/v1/token'
@@ -172,7 +193,7 @@ class Form extends React.Component {
   };
 
   renderPositions() {
-    if (this.state.positionsError !== '') {
+    if (this.state.errors.positions !== '') {
       return null;
     }
 
@@ -194,6 +215,7 @@ class Form extends React.Component {
     return (
       <>
         <Input
+          id="name"
           name="name"
           type="text"
           label="Your name"
@@ -202,6 +224,7 @@ class Form extends React.Component {
           onChange={this.onInputChange}
         />
         <Input
+          id="email"
           name="email"
           type="email"
           label="Email"
@@ -210,6 +233,7 @@ class Form extends React.Component {
           onChange={this.onInputChange}
         />
         <Input
+          id="phone"
           name="tel"
           type="tel"
           label="Phone"
@@ -219,7 +243,7 @@ class Form extends React.Component {
           helperText="+38 (XXX) XXX - XX - XX"
         />
         <div>
-          <p>{this.state.positionsError || 'Select your position'}</p>
+          <p>{this.state.errors.positions || 'Select your position'}</p>
           <div className="form-radio">{this.renderPositions()}</div>
         </div>
         <div>

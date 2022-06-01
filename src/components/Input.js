@@ -8,13 +8,14 @@ const Input = (props) => {
       }`}
     >
       <input
+        id={props.id}
         type={props.type}
         name={props.name}
         onChange={props.onChange}
         value={props.value}
         noValidate
       />
-      <label>{props.label}</label>
+      <label htmlFor={props.id}>{props.label}</label>
       <div className="input-helper">{props.helperText || props.error}</div>
     </div>
   );
