@@ -6,12 +6,19 @@ class Intro extends React.Component {
     return (
       <div className="intro">
         <div className="intro-bg">
-          <img
-            width="1170"
-            height="650"
-            src="./assets/pexels-alexandr-podvalny-1227513.jpg"
-            alt="Wheat"
-          />
+          <picture>
+            <source
+              type="image/webp"
+              srcSet="./assets/intro.webp, ./assets/intro@2x.webp 2x"
+            />
+            <img
+              src="./assets/intro.jpg"
+              srcSet="./assets/intro@2x.jpg 2x"
+              width="1170"
+              height="650"
+              alt="Поле"
+            />
+          </picture>
         </div>
         <div className="intro-content">
           <h1>Test assignment for front-end developer</h1>
