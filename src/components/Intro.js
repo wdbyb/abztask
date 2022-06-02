@@ -9,6 +9,16 @@ class Intro extends React.Component {
           <picture>
             <source
               type="image/webp"
+              srcSet="./assets/intro-mobile.webp, ./assets/intro-mobile@2x.webp"
+              media="(max-width: 768px)"
+            />
+            <source
+              type="image/jpg"
+              srcSet="./assets/intro-mobile.jpg, ./assets/intro-mobile@2x.jpg"
+              media="(max-width: 768px)"
+            />
+            <source
+              type="image/webp"
               srcSet="./assets/intro.webp, ./assets/intro@2x.webp 2x"
             />
             <img
