@@ -8,10 +8,20 @@
 @import './Tooltip.scss';
 @import './Loader.scss';
 
+@font-face {
+  font-style: normal;
+  font-weight: 400;
+  font-family: 'Nunito';
+
+  font-display: swap;
+  src: url('../../public/assets/Nunito-Regular.woff2') format('woff2'),
+    url('../../public/assets/Nunito-Regular.woff') format('woff');
+}
+
 body {
   margin: 0;
 
-  font-family: 'Nunito';
+  font-family: 'Nunito', sans-serif;
   font-size: 16px;
   line-height: 26px;
   font-weight: 400;
