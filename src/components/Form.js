@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Button from './Button';
 import InputRadio from './InputRadio';
 import Input from './Input';
@@ -8,63 +8,28 @@ const validEmailRegex = RegExp(
 );
 const validTelRegex = RegExp(`^[+]{0,1}380([0-9]{9})$`);
 
-class Form extends React.Component {
-  constructor(props) {
-    super(props);
+const Form = (props) => {
+  const [errors, setErrors] = useState({
+    name: '',
+    email: '',
+    tel: '',
+    img: '',
+    positions: props.positionsError,
+  });
+  const [isSubmitSuccess, setIsSubmitSuccess] = useState(false);
+  const [nameValue, setNameValue] = useState('');
+  const [emailValue, setEmailValue] = useState('');
+  const [phoneValue, setPhoneValue] = useState('');
+  const [imageName, setImageName] = useState('');
+  const [positionId, setPositionId] = useState(1);
+  const fileInputRef = useRef();
 
-    this.state = {
-      isSubmitSuccess: false,
-      positions: [],
-      name: '',
-      email: '',
-      tel: '',
-      positionId: 1,
-      imageName: '',
-      errors: {
-        name: '',
-        email: '',
-        tel: '',
-        img: '',
-        positions: '',
-      },
-    };
-    this.fileInput = React.createRef();
-  }
-
-  componentDidMount() {
-    fetch('https://frontend-test-assignment-api.abz.agency/api/v1/positions')
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        if (data.success) {
-          // process success response
-          this.setState({
-            positions: data.positions,
-            errors: {
-              ...this.state.errors,
-              positions: '',
-            },
-          });
-        } else {
-          this.setState({
-            errors: {
-              ...this.state.errors,
-              positions: 'Positions not found',
-            },
-          });
-        }
-      });
-  }
-
-  onRadioChange = (event) => {
-    this.setState({ positionId: event.target.id[event.target.id.length - 1] });
+  const onRadioChange = (event) => {
+    setPositionId(event.target.id[event.target.id.length - 1]);
   };
 
-  isSubmitDisabled = () => {
-    const { name, email, tel, imageName, errors } = this.state;
-
-    if (name && email && tel && imageName) {
+  const isSubmitDisabled = () => {
+    if (nameValue && emailValue && phoneValue && imageName) {
       if (
         !errors.email &&
         !errors.name &&
@@ -79,10 +44,10 @@ class Form extends React.Component {
     return true;
   };
 
-  onSubmit = async (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
 
-    if (this.isSubmitDisabled()) {
+    if (isSubmitDisabled()) {
       return;
     }
 
@@ -92,11 +57,11 @@ class Form extends React.Component {
     const { token } = await response.json();
     let formData = new FormData();
 
-    formData.append('position_id', this.state.positionId);
-    formData.append('name', this.state.name);
-    formData.append('email', this.state.email);
-    formData.append('phone', this.state.tel);
-    formData.append('photo', this.fileInput.current.files[0]);
+    formData.append('position_id', positionId);
+    formData.append('name', nameValue);
+    formData.append('email', emailValue);
+    formData.append('phone', phoneValue);
+    formData.append('photo', fileInputRef.current.files[0]);
 
     fetch('https://frontend-test-assignment-api.abz.agency/api/v1/users', {
       method: 'POST',
@@ -112,8 +77,8 @@ class Form extends React.Component {
       .then((data) => {
         if (data.success) {
           // process success response
-          this.setState({ isSubmitSuccess: true });
-          this.props.onSubmitSuccess();
+          setIsSubmitSuccess(true);
+          props.onSubmitSuccess();
         } else {
           // proccess server errors
           console.log(data);
@@ -125,24 +90,17 @@ class Form extends React.Component {
       });
   };
 
-  onFileChange = (e) => {
+  const onFileChange = (e) => {
     const setErrorImageMessage = (message) => {
-      this.setState((prevState) => ({
-        errors: {
-          ...prevState.errors,
-          img: message,
-        },
-      }));
-    };
-
-    const setImageName = (imageName) => {
-      this.setState({ imageName });
+      setErrors({
+        ...errors,
+        img: message,
+      });
     };
 
     if (e.target.files && e.target.files[0]) {
       const img = document.createElement('img');
       const type = e.target.files[0].type.replace('image/', '');
-      // this.state.backgroundImageFile = e.target.files[0];
 
       img.onload = function () {
         if (this.width < 70 || this.height < 70) {
@@ -167,51 +125,53 @@ class Form extends React.Component {
     }
   };
 
-  onInputChange = (event) => {
+  const onInputChange = (event) => {
     event.preventDefault();
     const { name, value } = event.target;
-    const { errors } = this.state;
 
     switch (name) {
       case 'name':
+        setNameValue(value);
         errors.name =
           value.length < 2 || value.length > 60
             ? 'Full Name must be at least 2 characters long but no more than 60!'
             : '';
         break;
       case 'email':
+        setEmailValue(value);
         errors.email = validEmailRegex.test(value) ? '' : 'Email is not valid!';
         break;
       case 'tel':
+        setPhoneValue(value);
         errors.tel = validTelRegex.test(value) ? '' : '+38 (XXX) XXX - XX - XX';
         break;
       default:
         break;
     }
 
-    this.setState({ errors, [name]: value });
+    setErrors({ ...errors });
   };
 
-  renderPositions() {
-    if (this.state.errors.positions !== '') {
+  const renderPositions = () => {
+    if (errors.positions !== '') {
       return null;
     }
 
-    return this.state.positions.map((position) => {
+    return props.positions.map((position) => {
       return (
         <InputRadio
           name="position"
           value={position.name}
           id={'position' + position.id}
           key={position.id}
-          onChange={(e) => this.onRadioChange(e)}
-          defaultChecked={this.state.positionId === position.id}
+          onChange={(e) => onRadioChange(e)}
+          defaultChecked={positionId === position.id}
         />
       );
     });
-  }
+  };
 
-  renderInputs() {
+  const renderInputs = () => {
     return (
       <>
         <Input
@@ -219,82 +179,73 @@ class Form extends React.Component {
           name="name"
           type="text"
           label="Your name"
-          error={this.state.errors.name}
-          value={this.state.name}
-          onChange={this.onInputChange}
+          error={errors.name}
+          value={nameValue}
+          onChange={onInputChange}
         />
         <Input
           id="email"
           name="email"
           type="email"
           label="Email"
-          error={this.state.errors.email}
-          value={this.state.email}
-          onChange={this.onInputChange}
+          error={errors.email}
+          value={emailValue}
+          onChange={onInputChange}
         />
         <Input
           id="phone"
           name="tel"
           type="tel"
           label="Phone"
-          error={this.state.errors.tel}
-          value={this.state.tel}
-          onChange={this.onInputChange}
+          error={errors.tel}
+          value={phoneValue}
+          onChange={onInputChange}
           helperText="+38 (XXX) XXX - XX - XX"
         />
         <div>
-          <p>{this.state.errors.positions || 'Select your position'}</p>
-          <div className="form-radio">{this.renderPositions()}</div>
+          <p>{errors.positions || 'Select your position'}</p>
+          <div className="form-radio">{renderPositions()}</div>
         </div>
         <div>
           <div className="input-file">
             <input
               type="file"
-              onChange={this.onFileChange}
-              ref={this.fileInput}
+              onChange={onFileChange}
+              ref={fileInputRef}
               id="input-file"
             />
             <label htmlFor="input-file">Upload</label>
             <div className="input-file-text">
-              {this.state.imageName || 'Upload your photo'}
+              {imageName || 'Upload your photo'}
             </div>
-            <div className="input-helper">{this.state.errors.img}</div>
+            <div className="input-helper">{errors.img}</div>
           </div>
         </div>
-        <Button buttonText="Sign up" disabled={this.isSubmitDisabled()} />
+        <Button buttonText="Sign up" disabled={isSubmitDisabled()} />
       </>
     );
-  }
+  };
 
-  renderSuccessImage() {
+  const renderSuccessImage = () => {
     return (
       <div className="form-success">
         <img src="./assets/success-image.svg" alt="Success" />
       </div>
     );
-  }
+  };
 
-  render() {
-    return (
-      <form
-        noValidate
-        onSubmit={this.onSubmit}
-        autoComplete="off"
-        className="form"
-      >
-        <h2>
-          {this.state.isSubmitSuccess
-            ? 'User successfully registered'
-            : 'Working with POST request'}
-        </h2>
-        <div className="form-wrapper">
-          {this.state.isSubmitSuccess
-            ? this.renderSuccessImage()
-            : this.renderInputs()}
-        </div>
-      </form>
-    );
-  }
-}
+  return (
+    <form noValidate onSubmit={onSubmit} autoComplete="off" className="form">
+      <h2>
+        {isSubmitSuccess
+          ? 'User successfully registered'
+          : 'Working with POST request'}
+      </h2>
+      <div className="form-wrapper">
+        {isSubmitSuccess ? renderSuccessImage() : renderInputs()}
+      </div>
+    </form>
+  );
+};
 
 export default Form;
